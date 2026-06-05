@@ -170,6 +170,7 @@ export interface TranslationDictionary extends ExtendedTranslationDictionarySect
     team: string;
     featureExplorer: string;
     traces: string;
+    workspaceSettings: string;
     settings: string;
     notifications: string;
     connected: string;
@@ -869,6 +870,8 @@ export interface TranslationDictionary extends ExtendedTranslationDictionarySect
     deleteWorkspaceActiveWarning: string;
     deleteWorkspaceLastWarning: string;
     deleteFailed: string;
+    settings: string;
+    worktreeRootSaved: string;
   };
 
   // Notifications

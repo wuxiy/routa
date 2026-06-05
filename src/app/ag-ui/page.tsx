@@ -739,6 +739,7 @@ export default function AGUIPage() {
                   setSelectedWorkspaceId(workspace.id);
                 }
               }}
+              onRename={workspacesHook.renameWorkspace}
               loading={workspacesHook.loading}
             />
 

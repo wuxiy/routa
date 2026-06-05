@@ -41,7 +41,7 @@ interface TriggerLog {
 }
 
 export default function MessagesPage() {
-  const { workspaces, loading: workspacesLoading, createWorkspace } = useWorkspaces();
+  const { workspaces, loading: workspacesLoading, createWorkspace, renameWorkspace } = useWorkspaces();
   const [tab, setTab] = useState<"tasks" | "logs">("tasks");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState("");
   const [tasks, setTasks] = useState<BackgroundTask[]>([]);
@@ -110,6 +110,7 @@ export default function MessagesPage() {
                 setSelectedWorkspaceId(workspace.id);
               }
             }}
+            onRename={renameWorkspace}
             loading={workspacesLoading}
           />
           <button

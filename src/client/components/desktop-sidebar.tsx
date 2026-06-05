@@ -14,7 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/i18n";
-import { ChevronLeft, ClipboardList, Columns2, FileCode2, House, MonitorUp, ScrollText, Settings, Share2 } from "lucide-react";
+import { ChevronLeft, ClipboardList, Columns2, FileCode2, House, MonitorUp, ScrollText, Settings, Share2, SlidersHorizontal } from "lucide-react";
 import { HarnessMark } from "./harness-mark";
 
 
@@ -109,6 +109,14 @@ export function DesktopSidebar({
       href: workspaceBaseHref ? `${workspaceBaseHref}/feature-explorer` : "/",
       icon: (
         <FileCode2 className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}/>
+      ),
+    },
+    {
+      id: "workspace-settings",
+      label: t.nav.workspaceSettings,
+      href: workspaceBaseHref ? `${workspaceBaseHref}/settings` : "/",
+      icon: (
+        <SlidersHorizontal className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}/>
       ),
     },
     {

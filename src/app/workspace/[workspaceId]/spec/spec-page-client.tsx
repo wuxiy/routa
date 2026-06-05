@@ -1324,6 +1324,7 @@ export function SpecPageClient() {
           activeWorkspaceTitle={workspace?.title ?? (workspaceId === "default" ? t.workspace.defaultWorkspace : workspaceId)}
           onSelect={handleWorkspaceSelect}
           onCreate={handleWorkspaceCreate}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
           desktop

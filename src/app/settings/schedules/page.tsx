@@ -39,6 +39,7 @@ export default function SchedulesSettingsPage() {
               setSelectedWorkspaceId(workspace.id);
             }
           }}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
           desktop

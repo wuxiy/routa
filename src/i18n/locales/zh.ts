@@ -163,6 +163,7 @@ const zh: TranslationDictionary = {
     team: "团队",
     featureExplorer: "特性浏览",
    traces: "追踪",
+    workspaceSettings: "工作区设置",
     settings: "设置",
     notifications: "通知",
     connected: "已连接",
@@ -858,6 +859,8 @@ const zh: TranslationDictionary = {
     deleteWorkspaceActiveWarning: "无法删除当前活跃工作区，请先切换到其他工作区。",
     deleteWorkspaceLastWarning: "无法删除最后一个工作区，至少保留一个工作区。",
     deleteFailed: "删除工作区失败",
+    settings: "工作区设置",
+    worktreeRootSaved: "Worktree 根目录保存成功",
   },
 
   notifications: {

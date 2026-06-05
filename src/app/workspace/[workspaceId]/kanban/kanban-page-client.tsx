@@ -470,6 +470,10 @@ export function KanbanPageClient() {
     }
   }, [router, workspacesHook]);
 
+  const handleWorkspaceRename = useCallback(async (id: string, title: string): Promise<boolean> => {
+    return workspacesHook.renameWorkspace(id, title);
+  }, [workspacesHook]);
+
   return (
     <DesktopAppShell
       workspaceId={workspaceId}
@@ -481,6 +485,7 @@ export function KanbanPageClient() {
           activeWorkspaceTitle={activeWorkspaceTitle}
           onSelect={handleWorkspaceSelect}
           onCreate={handleWorkspaceCreate}
+          onRename={handleWorkspaceRename}
           loading={workspacesHook.loading}
           compact
           desktop

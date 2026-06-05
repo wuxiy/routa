@@ -22,6 +22,7 @@ export function SetupView({
   activeWorkspaceId,
   onWorkspaceChange,
   onWorkspaceCreate,
+  onWorkspaceRename,
   repoSelection,
   onRepoChange,
   agentRole,
@@ -105,6 +106,7 @@ export function SetupView({
               activeWorkspaceId={activeWorkspaceId}
               onSelect={onWorkspaceChange}
               onCreate={onWorkspaceCreate}
+              onRename={onWorkspaceRename}
               compact
             />
           </div>

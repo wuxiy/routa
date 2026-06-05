@@ -316,6 +316,7 @@ function HomePageContent() {
           onCreate={async (title) => {
             await handleWorkspaceCreate(title);
           }}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
           desktop

@@ -124,6 +124,7 @@ export function FluencySettingsPageClient({ defaultRepoPath }: FluencySettingsPa
             setInitialRepoPath("");
             setSelectedRepoOverrideState({ workspaceId: nextWorkspaceId, selection: null });
           }}
+          onRename={workspacesHook.renameWorkspace}
           onCreate={async (title) => {
             const workspace = await workspacesHook.createWorkspace(title);
             if (workspace) {

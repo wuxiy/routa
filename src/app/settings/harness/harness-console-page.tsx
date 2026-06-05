@@ -995,6 +995,7 @@ export default function HarnessConsolePage() {
             setSelectedRepoOverrideState({ workspaceId: nextWorkspaceId, selection: null });
             setSelectedCodebaseId("");
           }}
+          onRename={workspacesHook.renameWorkspace}
           onCreate={async (title) => {
             const workspace = await workspacesHook.createWorkspace(title);
             if (workspace) {

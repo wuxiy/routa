@@ -32,6 +32,7 @@ export interface SetupViewProps {
   activeWorkspaceId: string | null;
   onWorkspaceChange: (id: string) => void;
   onWorkspaceCreate?: (title: string) => Promise<void> | void;
+  onWorkspaceRename?: (id: string, title: string) => Promise<boolean>;
   repoSelection: RepoSelection | null;
   onRepoChange: (selection: RepoSelection | null) => void;
 

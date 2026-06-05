@@ -31,6 +31,8 @@ export interface AppHeaderProps {
   onWorkspaceSelect: (wsId: string) => void;
   /** Called when user creates a new workspace */
   onWorkspaceCreate: (title: string) => Promise<void>;
+  /** Called when user renames a workspace */
+  onWorkspaceRename?: (id: string, title: string) => Promise<boolean>;
 
   /**
    * Layout variant:
@@ -56,6 +58,7 @@ export function AppHeader({
   workspacesLoading,
   onWorkspaceSelect,
   onWorkspaceCreate,
+  onWorkspaceRename,
   variant = "session",
   showMobileSidebar,
   onToggleMobileSidebar,
@@ -119,6 +122,7 @@ export function AppHeader({
               activeWorkspaceId={workspaceId}
               onSelect={onWorkspaceSelect}
               onCreate={onWorkspaceCreate}
+              onRename={onWorkspaceRename}
               loading={workspacesLoading}
               compact
             />
@@ -132,6 +136,7 @@ export function AppHeader({
             activeWorkspaceId={workspaceId}
             onSelect={onWorkspaceSelect}
             onCreate={onWorkspaceCreate}
+            onRename={onWorkspaceRename}
             loading={workspacesLoading}
           />
         </>

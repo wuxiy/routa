@@ -202,6 +202,7 @@ export function TeamPageClient() {
           activeWorkspaceTitle={workspace?.title ?? (workspaceId === "default" ? "Default Workspace" : workspaceId)}
           onSelect={handleWorkspaceSelect}
           onCreate={handleWorkspaceCreate}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
           desktop

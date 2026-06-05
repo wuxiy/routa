@@ -23,6 +23,7 @@ interface DesktopLayoutProps {
   workspacesLoading?: boolean;
   onWorkspaceSelect: (wsId: string) => void;
   onWorkspaceCreate: (title: string) => Promise<void>;
+  onWorkspaceRename?: (id: string, title: string) => Promise<boolean>;
   /** Optional right side content for the title bar */
   titleBarRight?: React.ReactNode;
 }
@@ -35,6 +36,7 @@ export function DesktopLayout({
   workspacesLoading,
   onWorkspaceSelect,
   onWorkspaceCreate,
+  onWorkspaceRename,
   titleBarRight,
 }: DesktopLayoutProps) {
   return (
@@ -52,6 +54,7 @@ export function DesktopLayout({
             activeWorkspaceTitle={activeWorkspaceTitle}
             onSelect={onWorkspaceSelect}
             onCreate={onWorkspaceCreate}
+            onRename={onWorkspaceRename}
             loading={workspacesLoading}
             compact
           />

@@ -1362,6 +1362,7 @@ export function TeamRunPageClient() {
               router.push(`/workspace/${nextWorkspace.id}/team`);
             }
           }}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
         />

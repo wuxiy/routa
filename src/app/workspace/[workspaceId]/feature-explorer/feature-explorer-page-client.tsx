@@ -844,6 +844,7 @@ export function FeatureExplorerPageClient({
           activeWorkspaceTitle={workspace?.title ?? workspaceId}
           onSelect={handleWorkspaceSelect}
           onCreate={handleWorkspaceCreate}
+          onRename={workspacesHook.renameWorkspace}
           loading={workspacesHook.loading}
           compact
           desktop

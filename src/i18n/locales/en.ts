@@ -164,6 +164,7 @@ const en: TranslationDictionary = {
     team: "Team",
     featureExplorer: "Feature Explorer",
     traces: "Traces",
+    workspaceSettings: "Workspace Settings",
     settings: "Settings",
     notifications: "Notifications",
     connected: "Connected",
@@ -862,6 +863,8 @@ const en: TranslationDictionary = {
     deleteWorkspaceActiveWarning: "Cannot delete the active workspace. Switch to another workspace first.",
     deleteWorkspaceLastWarning: "Cannot delete the last workspace. At least one workspace must remain.",
     deleteFailed: "Failed to delete workspace",
+    settings: "Workspace Settings",
+    worktreeRootSaved: "Worktree root saved successfully",
   },
 
   notifications: {

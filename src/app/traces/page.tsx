@@ -56,7 +56,7 @@ function TracePageContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { workspaces, loading: workspacesLoading, createWorkspace } = useWorkspaces();
+  const { workspaces, loading: workspacesLoading, createWorkspace, renameWorkspace } = useWorkspaces();
 
   const [activeWorkspaceId, setActiveWorkspaceId] = useState("");
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -293,6 +293,7 @@ function TracePageContent() {
           activeWorkspaceTitle={activeWorkspace?.title}
           onSelect={handleWorkspaceSelect}
           onCreate={handleWorkspaceCreate}
+          onRename={renameWorkspace}
           loading={workspacesLoading}
           compact
           desktop
