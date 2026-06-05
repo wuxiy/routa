@@ -31,6 +31,8 @@ export interface UseWorkspacesReturn {
   fetchWorkspaces: () => Promise<void>;
   createWorkspace: (title: string) => Promise<WorkspaceData | null>;
   archiveWorkspace: (id: string) => Promise<void>;
+  renameWorkspace: (id: string, title: string) => Promise<boolean>;
+  deleteWorkspace: (id: string) => Promise<boolean>;
 }
 
 export function useWorkspaces(): UseWorkspacesReturn {
@@ -71,11 +73,31 @@ export function useWorkspaces(): UseWorkspacesReturn {
     await fetchWorkspaces();
   }, [fetchWorkspaces]);
 
+  const renameWorkspace = useCallback(async (id: string, title: string): Promise<boolean> => {
+    const res = await desktopAwareFetch(`/api/workspaces/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    });
+    if (!res.ok) return false;
+    await fetchWorkspaces();
+    return true;
+  }, [fetchWorkspaces]);
+
+  const deleteWorkspace = useCallback(async (id: string): Promise<boolean> => {
+    const res = await desktopAwareFetch(`/api/workspaces/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) return false;
+    await fetchWorkspaces();
+    return true;
+  }, [fetchWorkspaces]);
+
   useEffect(() => {
     fetchWorkspaces();
   }, [fetchWorkspaces]);
 
-  return { workspaces, loading, fetchWorkspaces, createWorkspace, archiveWorkspace };
+  return { workspaces, loading, fetchWorkspaces, createWorkspace, archiveWorkspace, renameWorkspace, deleteWorkspace };
 }
 
 export function useCodebases(workspaceId: string): {

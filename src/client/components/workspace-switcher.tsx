@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { WorkspaceData } from "../hooks/use-workspaces";
 import { useTranslation } from "@/i18n";
 import { normalizeWorkspaceQueryId } from "../utils/workspace-id";
-import { Check, ChevronDown, Folder, Plus, Search } from "lucide-react";
+import { Check, ChevronDown, Folder, Pencil, Plus, Search, X } from "lucide-react";
 
 const DESKTOP_LAST_WORKSPACE_ID_STORAGE_KEY = "routa.desktop.last-workspace-id";
 
@@ -23,6 +23,7 @@ interface WorkspaceSwitcherProps {
   activeWorkspaceTitle?: string;
   onSelect: (workspaceId: string) => void;
   onCreate?: (title: string) => Promise<void> | void;
+  onRename?: (id: string, title: string) => Promise<boolean>;
   loading?: boolean;
   compact?: boolean;
   /** Use desktop/VS Code style theme */
@@ -35,6 +36,7 @@ export function WorkspaceSwitcher({
   activeWorkspaceTitle,
   onSelect,
   onCreate,
+  onRename,
   loading,
   compact,
   desktop,
@@ -43,6 +45,9 @@ export function WorkspaceSwitcher({
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renamingTitle, setRenamingTitle] = useState("");
+  const [renameError, setRenameError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
@@ -54,6 +59,9 @@ export function WorkspaceSwitcher({
     setOpen(false);
     setCreating(false);
     setSearchQuery("");
+    setRenamingId(null);
+    setRenamingTitle("");
+    setRenameError(null);
   }, []);
 
   useEffect(() => {
@@ -104,6 +112,31 @@ export function WorkspaceSwitcher({
     await onCreate(title);
     setNewTitle("");
     closeDropdown();
+  };
+
+  const handleRename = async (id: string) => {
+    const title = renamingTitle.trim();
+    if (!title || !onRename) return;
+    setRenameError(null);
+    const ok = await onRename(id, title);
+    if (ok) {
+      setRenamingId(null);
+      setRenamingTitle("");
+    } else {
+      setRenameError(t.workspace.renameFailed);
+    }
+  };
+
+  const startRenaming = (id: string, currentTitle: string) => {
+    setRenamingId(id);
+    setRenamingTitle(currentTitle);
+    setRenameError(null);
+  };
+
+  const cancelRenaming = () => {
+    setRenamingId(null);
+    setRenamingTitle("");
+    setRenameError(null);
   };
 
   const filteredWorkspaces = searchQuery
@@ -197,25 +230,94 @@ export function WorkspaceSwitcher({
               </div>
             )}
             {filteredWorkspaces.map((ws) => (
-              <button
-                key={ws.id}
-                type="button"
-                onClick={() => {
-                  onSelect(ws.id);
-                  closeDropdown();
-                }}
-                className={`${listItemBase} ${
-                  ws.id === activeWorkspaceId
-                    ? activeItemCls
-                    : `${panelText} hover:bg-current/10`
-                }`}
-              >
-                <Folder className={rowIcon} strokeWidth={2} />
-                <span className="min-w-0 flex-1 truncate">{ws.title}</span>
-                {ws.id === activeWorkspaceId ? (
-                  <Check className={rowActiveIcon} fill="currentColor" />
-                ) : null}
-              </button>
+              <div key={ws.id} className="group relative">
+                {renamingId === ws.id ? (
+                  <div className={`${listItemBase} gap-1`}>
+                    <input
+                      type="text"
+                      value={renamingTitle}
+                      onChange={(e) => {
+                        setRenamingTitle(e.target.value);
+                        setRenameError(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") void handleRename(ws.id);
+                        if (e.key === "Escape") cancelRenaming();
+                      }}
+                      placeholder={t.workspace.workspaceName}
+                      className={`flex-1 rounded border px-2 py-0.5 outline-none ${createInputCls}`}
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void handleRename(ws.id);
+                      }}
+                      disabled={!renamingTitle.trim()}
+                      className="shrink-0 rounded p-0.5 text-desktop-accent hover:bg-desktop-bg-active/80 disabled:opacity-40"
+                      title={t.common.confirm}
+                    >
+                      <Check className="w-3 h-3" strokeWidth={2} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        cancelRenaming();
+                      }}
+                      className="shrink-0 rounded p-0.5 text-desktop-text-secondary hover:bg-desktop-bg-active/80"
+                      title={t.common.cancel}
+                    >
+                      <X className="w-3 h-3" strokeWidth={2} />
+                    </button>
+                    {renameError && (
+                      <span className="absolute -bottom-4 left-2 text-[10px] text-rose-500 whitespace-nowrap">
+                        {renameError}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelect(ws.id);
+                        closeDropdown();
+                      }}
+                      className={`${listItemBase} ${
+                        ws.id === activeWorkspaceId
+                          ? activeItemCls
+                          : `${panelText} hover:bg-current/10`
+                      }`}
+                    >
+                      <Folder className={rowIcon} strokeWidth={2} />
+                      <span className="min-w-0 flex-1 truncate">{ws.title}</span>
+                      {ws.id === activeWorkspaceId ? (
+                        <Check className={rowActiveIcon} fill="currentColor" />
+                      ) : null}
+                    </button>
+                    {onRename && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startRenaming(ws.id, ws.title);
+                        }}
+                        className={`absolute right-1 top-1/2 -translate-y-1/2 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity ${
+                          isDesktopTheme
+                            ? "text-desktop-text-secondary hover:text-desktop-accent hover:bg-desktop-bg-active/80"
+                            : "text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        }`}
+                        title={t.workspace.renameWorkspace}
+                      >
+                        <Pencil className={isDesktopTheme ? "w-2.5 h-2.5" : "w-3 h-3"} strokeWidth={2} />
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             ))}
           </div>
 

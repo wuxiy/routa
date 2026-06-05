@@ -852,6 +852,23 @@ export interface TranslationDictionary extends ExtendedTranslationDictionarySect
     updatingRepository: string;
     defaultLabel: string;
     saving: string;
+    renameWorkspace: string;
+    renameWorkspaceHint: string;
+    renameFailed: string;
+    renameTitleEmpty: string;
+    dangerZone: string;
+    deleteWorkspace: string;
+    deleteWorkspaceConfirmTitle: string;
+    deleteWorkspaceCascadeDescription: string;
+    deleteWorkspaceCascadeSessions: string;
+    deleteWorkspaceCascadeTasks: string;
+    deleteWorkspaceCascadeNotes: string;
+    deleteWorkspaceCascadeBoards: string;
+    deleteWorkspaceCascadeCodebases: string;
+    deleteWorkspaceConfirm: string;
+    deleteWorkspaceActiveWarning: string;
+    deleteWorkspaceLastWarning: string;
+    deleteFailed: string;
   };
 
   // Notifications

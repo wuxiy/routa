@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { useTranslation } from "@/i18n";
 import { RepoPicker } from "@/client/components/repo-picker";
 import type { RepoSelection } from "@/client/components/repo-picker";
+import type { WorkspaceData } from "@/client/hooks/use-workspaces";
 import { desktopAwareFetch } from "@/client/utils/diagnostics";
+import { AlertTriangle } from "lucide-react";
 
 interface CodebaseInfo {
   id: string;
@@ -23,6 +25,10 @@ interface WorkspaceSettingsTabProps {
   displayedWorktreeRoot: string;
   defaultWorktreeRootHint: string;
   onSaveWorktreeRoot: () => Promise<void>;
+  workspaces?: WorkspaceData[];
+  activeWorkspaceId?: string | null;
+  onDeleteWorkspace?: (id: string) => Promise<boolean>;
+  onWorkspaceDeleted?: (remainingWorkspaces: WorkspaceData[]) => void;
 }
 
 export function WorkspaceSettingsTab({
@@ -35,6 +41,10 @@ export function WorkspaceSettingsTab({
   displayedWorktreeRoot,
   defaultWorktreeRootHint,
   onSaveWorktreeRoot,
+  workspaces,
+  activeWorkspaceId,
+  onDeleteWorkspace,
+  onWorkspaceDeleted,
 }: WorkspaceSettingsTabProps) {
   const { t } = useTranslation();
   const [repoPickerValue, setRepoPickerValue] = useState<RepoSelection | null>(null);
@@ -44,6 +54,34 @@ export function WorkspaceSettingsTab({
   const [editRepoSelection, setEditRepoSelection] = useState<RepoSelection | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const isActiveWorkspace = activeWorkspaceId === workspaceId;
+  const isLastWorkspace = (workspaces?.length ?? 0) <= 1;
+  const canDelete = !isActiveWorkspace && !isLastWorkspace && !!onDeleteWorkspace;
+
+  const handleDelete = async () => {
+    if (!onDeleteWorkspace) return;
+    setDeleting(true);
+    setDeleteError(null);
+    const ok = await onDeleteWorkspace(workspaceId);
+    setDeleting(false);
+    if (ok) {
+      setShowDeleteConfirm(false);
+      const remaining = (workspaces ?? []).filter((w) => w.id !== workspaceId);
+      onWorkspaceDeleted?.(remaining);
+    } else {
+      setDeleteError(t.workspace.deleteFailed);
+    }
+  };
+
+  const deleteDisabledReason = (): string | null => {
+    if (isActiveWorkspace) return t.workspace.deleteWorkspaceActiveWarning;
+    if (isLastWorkspace) return t.workspace.deleteWorkspaceLastWarning;
+    return null;
+  };
 
   const handlePickerChange = async (selection: RepoSelection | null) => {
     if (!selection) return;
@@ -220,6 +258,75 @@ export function WorkspaceSettingsTab({
           </button>
         </div>
       </section>
+
+      {/* ── Danger Zone ──────────────────────────────────────────────── */}
+      <hr className="border-red-200 dark:border-red-900/30" />
+      <section>
+        <h3 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-1 flex items-center gap-1.5">
+          <AlertTriangle className="w-4 h-4" />
+          {t.workspace.dangerZone}
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+          {t.workspace.deleteWorkspace}
+        </p>
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          disabled={!canDelete}
+          className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+          title={deleteDisabledReason() ?? undefined}
+        >
+          {t.workspace.deleteWorkspace}
+        </button>
+        {deleteDisabledReason() && (
+          <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
+            {deleteDisabledReason()}
+          </p>
+        )}
+      </section>
+
+      {/* ── Delete Confirmation Modal ──────────────────────────────── */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-[#1c1f2e] dark:bg-[#12141c]">
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              {t.workspace.deleteWorkspaceConfirmTitle}
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+              {t.workspace.deleteWorkspaceCascadeDescription}
+            </p>
+            <ul className="space-y-1.5 mb-5 text-sm text-slate-600 dark:text-slate-300">
+              <li className="flex items-center gap-2">• {t.workspace.deleteWorkspaceCascadeSessions}</li>
+              <li className="flex items-center gap-2">• {t.workspace.deleteWorkspaceCascadeTasks}</li>
+              <li className="flex items-center gap-2">• {t.workspace.deleteWorkspaceCascadeNotes}</li>
+              <li className="flex items-center gap-2">• {t.workspace.deleteWorkspaceCascadeBoards}</li>
+              <li className="flex items-center gap-2">• {t.workspace.deleteWorkspaceCascadeCodebases}</li>
+            </ul>
+            {deleteError && (
+              <div className="mb-3 text-xs text-rose-600 dark:text-rose-400">{deleteError}</div>
+            )}
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeleteError(null);
+                }}
+                disabled={deleting}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-[#191c28]"
+              >
+                {t.common.cancel}
+              </button>
+              <button
+                onClick={() => void handleDelete()}
+                disabled={deleting}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleting ? t.workspace.saving : t.workspace.deleteWorkspaceConfirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Edit Codebase Modal ───────────────────────────────────── */}
       {editingCodebase && (
